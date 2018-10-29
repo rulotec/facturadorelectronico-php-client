@@ -23,7 +23,7 @@ class AuthenticatedSoapClient extends SoapClientWrapper
 		return $result;
 	}
 	
-	private function checkErrors($result)
+	private function checkErrors(DOMDocument $result)
 	{
 		$errores = $this->getErroresNode($result);
 		
@@ -39,6 +39,7 @@ class AuthenticatedSoapClient extends SoapClientWrapper
 			
 			$e = new ExceptionPacTimbrado();
 			$e->setMensajesErrorUsuarioArray($mensajesError);
+			$e->setWsResult($result);
 			throw $e;
 		}
 	}
