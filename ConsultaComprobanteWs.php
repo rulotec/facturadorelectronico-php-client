@@ -35,10 +35,10 @@ class ConsultaComprobanteWs
 		'<ConsultaCfdi' . ' ' .
 		'rfcEmisor="' . $this->timbradoAccount->getRfcEmisor() . '" ' .
 		'rfcReceptor="' . $datosCancelacionFolio['rfcReceptor'] .'" ' .
-		'uuid="' . $datosCancelacionFolio['UUID'] . '" ' .
+		'UUID="' . $datosCancelacionFolio['UUID'] . '" ' .
 		'total="' . $datosCancelacionFolio['total'] . '" ' .
 		'llaveCertificado="' . $archivosCSDManager->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
-		'certificado="' . $archivosCSDManager->getCertificadoBase64() .
+		'certificado="' . $archivosCSDManager->getCertificadoBase64() . 
 		'"/>';
 		
 		return $xml;
