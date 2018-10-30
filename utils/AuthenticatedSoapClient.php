@@ -95,10 +95,10 @@ class SoapClientWrapper
 	private function logHTTPRequestAndResponse($client, $accion)
 	{
 		//error_log("Request headers: " . print_r($client->__getLastRequestHeaders(), 1) . "\n") ;
-		error_log("Request: " . $client->__getLastRequest() . "\n");
-		file_put_contents(PATH_LOGS . '/' . $accion. '_request_PAC.xml', $client->__getLastRequest());
+		//error_log("Request: " . $client->__getLastRequest() . "\n");
+		Logger::logComunicacionPac2Xml($client->__getLastRequest(), $accion, 'request');
 		//error_log("Response headers: " . print_r($client->__getLastResponseHeaders(), 1) . "\n");
-		error_log("Response: " . $client->__getLastResponse() . "\n");
-		file_put_contents(PATH_LOGS . '/' . $accion. '_response_PAC.xml', $client->__getLastResponse());
+		//error_log("Response: " . $client->__getLastResponse() . "\n");
+		Logger::logComunicacionPac2Xml($client->__getLastResponse(), $accion, 'response');
 	}
 }
