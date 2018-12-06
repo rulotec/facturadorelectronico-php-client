@@ -1,5 +1,7 @@
 <?php
 
+require_once (dirname(__FILE__) . '/WsErrorResponse.php');
+
 class AuthenticatedSoapClient extends SoapClientWrapper
 {
 	private $accountManager;
@@ -18,41 +20,10 @@ class AuthenticatedSoapClient extends SoapClientWrapper
 		$result = new DOMDocument();
 		$result->loadXML($soapResponse->$resultNodeName->any);
 		
-		$this->checkErrors($result);
+		$wsErrorResponse = new WsErrorResponse($result);
+		$wsErrorResponse->throwExceptionPacTimbradoIfErrors();
 		
 		return $result;
-	}
-	
-	private function checkErrors(DOMDocument $result)
-	{
-		$errores = $this->getErroresNode($result);
-		
-		if(!empty($errores))
-		{
-			$mensajesError = [];
-			foreach ($errores->getElementsByTagName("Error") as $error)
-			{
-				$mensajesError[] = "Error en petición al PAC: " .
-						htmlspecialchars($error->getAttribute("mensaje") .
-								" Código error PAC: {$error->getAttribute("codigo")}.");
-			}
-			
-			$e = new ExceptionPacTimbrado();
-			$e->setMensajesErrorUsuarioArray($mensajesError);
-			$e->setWsResult($result);
-			throw $e;
-		}
-	}
-	
-	private function getErroresNode($result)
-	{
-		$errores = $result->getElementsByTagName("errores")->item(0);
-		if(empty($errores))
-		{
-			//dependiendo de funcion llamada, a veces el nombde del nodo es con mayúscula.
-			$errores = $result->getElementsByTagName("Errores")->item(0);
-		}
-		return $errores;
 	}
 	
 	private function getAuthParams()

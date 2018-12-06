@@ -8,6 +8,8 @@ class EstatusCancelacionSAT
 	const CODIGO_FACTURA_NO_REGISTRADA_EN_SAT_AUN = 205;
 	const CODIGO_CFDI_NO_ES_DE_SECTOR_PRIMARIO = 206;
 	
+	const CODIGO_ERROR_CANCELADO_PREVIAMENTE = "FET102";
+	
 	public static function isErrorStatus($status)
 	{
 		$intStatus = (int) $status;

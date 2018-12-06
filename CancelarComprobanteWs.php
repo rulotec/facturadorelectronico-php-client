@@ -2,6 +2,7 @@
 
 require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
 require_once (dirname(__FILE__) . '/utils/EstatusCancelacionSAT.php');
+require_once (dirname(__FILE__) . '/utils/WsErrorResponse.php');
 
 class CancelarComprobanteWs
 {
@@ -17,7 +18,16 @@ class CancelarComprobanteWs
 	public function call($cancelacionArray)
 	{
 		$client = new AuthenticatedSoapClient($this->accountManager, $this->accountManager->getLinkWsCancelado());
-		$result = $client->call('CancelarComprobante', $this->getParams($cancelacionArray));
+		
+		try{
+			$result = $client->call('CancelarComprobante', $this->getParams($cancelacionArray));
+		} catch (ExceptionPacTimbrado $e) {
+			$wsErrorResponse = new WsErrorResponse($e->getWsResult());
+			if ($wsErrorResponse->isErrorCodePresent(EstatusCancelacionSAT::CODIGO_ERROR_CANCELADO_PREVIAMENTE)) {
+				return EstatusCancelacionSAT::CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE;
+			}
+			throw $e;
+		}
 		
 		return $this->procesarRespuestaWs($result);
 	}
@@ -78,10 +88,9 @@ class CancelarComprobanteWs
 			{
 				return $status;
 			}
-		}
-		else
-		{
+		} else {
 			throw new ExceptionPacTimbrado("Petición a PAC no válida.");
 		}
 	}
 }
+
