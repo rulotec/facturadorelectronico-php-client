@@ -31,7 +31,7 @@ class WsErrorResponse
 	public function isErrorCodePresent($errorCode)
 	{
 		foreach ($this->errores as $error) {
-			if($error[''] === $errorCode) {
+			if($error['codigo'] === $errorCode) {
 				return true;
 			}
 		}
