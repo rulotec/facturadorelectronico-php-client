@@ -5,12 +5,12 @@ require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
 class ConsultaComprobanteWs
 {
 	private $accountManager;
-	private $timbradoAccount;
+	private $cuentaTimbrado;
 	
 	public function __construct(AccountManager $accountManager)
 	{
 		$this->accountManager = $accountManager;
-		$this->timbradoAccount = $this->accountManager->getSimpleAccountManager();
+		$this->cuentaTimbrado = $this->accountManager->getCuentaTimbrado();
 	}
 	
 	public function call($datosCancelacionFolio)
@@ -33,7 +33,7 @@ class ConsultaComprobanteWs
 		$xml =
 		'<?xml version="1.0" encoding="utf-8"?>' .
 		'<ConsultaCfdi' . ' ' .
-		'rfcEmisor="' . $this->timbradoAccount->getRfcEmisor() . '" ' .
+		'rfcEmisor="' . $this->cuentaTimbrado->getRfcEmisor() . '" ' .
 		'rfcReceptor="' . $datosCancelacionFolio['rfcReceptor'] .'" ' .
 		'UUID="' . $datosCancelacionFolio['UUID'] . '" ' .
 		'total="' . $datosCancelacionFolio['total'] . '" ' .

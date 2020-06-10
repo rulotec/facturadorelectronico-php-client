@@ -7,12 +7,12 @@ require_once (dirname(__FILE__) . '/utils/WsErrorResponse.php');
 class CancelarComprobanteWs
 {
 	private $accountManager;
-	private $timbradoAccount;
+	private $cuentaTimbrado;
 	
 	public function __construct(AccountManager $accountManager)
 	{
 		$this->accountManager = $accountManager;
-		$this->timbradoAccount = $this->accountManager->getSimpleAccountManager();
+		$this->cuentaTimbrado = $this->accountManager->getCuentaTimbrado();
 	}
 	
 	public function call($cancelacionArray)
@@ -46,7 +46,7 @@ class CancelarComprobanteWs
 		'<Cancelacion' . ' ' .
 		'llaveCertificado="' . $archivosCSDManager->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
 		'certificado="' . $archivosCSDManager->getCertificadoBase64() . '" ' .
-		'rfcEmisor="' . $this->timbradoAccount->getRfcEmisor() . '">' .
+		'rfcEmisor="' . $this->cuentaTimbrado->getRfcEmisor() . '">' .
 		
 		'<Folios>';
 		
