@@ -4,17 +4,17 @@ require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
 
 class ObtenerTimbradoWs
 {
-	private $accountManager;
+	private $pacAccount;
 	private $timbreSat;
 	
-	public function __construct(AccountManager $accountManager)
+	public function __construct(CuentaTimbrado $cuentaTimbrado)
 	{
-		$this->accountManager = $accountManager;
+		$this->pacAccount = $cuentaTimbrado->getPacAccount();
 	}
 	
 	public function call($xmlFactura)
 	{
-		$client = new AuthenticatedSoapClient($this->accountManager, $this->accountManager->getLinkWs());
+		$client = new AuthenticatedSoapClient($this->pacAccount, $this->pacAccount->getLinkWs());
 		
 		try
 		{
@@ -42,7 +42,7 @@ class ObtenerTimbradoWs
 				'CFDIcliente' => trim($xmlFactura),
 				//Se proporciona parametro "Usuario" porque AuthenticatedSoapClient usa el parametro usuario (con minuscula) porque otros endpoints lo usan asi.
 				//FacturadorElectronico debe arreglar eso para no tener que hacer este tipo de parches.
-				'Usuario' => $this->accountManager->getUsuarioWs(),
+				'Usuario' => $this->pacAccount->getUsuarioWs(),
 		);
 		
 		return $params;

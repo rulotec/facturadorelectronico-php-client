@@ -4,11 +4,11 @@ require_once (dirname(__FILE__) . '/WsErrorResponse.php');
 
 class AuthenticatedSoapClient extends SoapClientWrapper
 {
-	private $accountManager;
+	private $pacAccount;
 	
-	public function __construct(AccountManager $accountManager, $wsdlUrl)
+	public function __construct(PacAccount $paccAccount, $wsdlUrl)
 	{
-		$this->accountManager = $accountManager;
+		$this->pacAccount = $paccAccount;
 		parent::__construct($wsdlUrl);
 	}
 	
@@ -29,8 +29,8 @@ class AuthenticatedSoapClient extends SoapClientWrapper
 	private function getAuthParams()
 	{
 		$params = array(
-				'usuario' => $this->accountManager->getUsuarioWs(),
-				'password' => $this->accountManager->getPasswordWs(),
+				'usuario' => $this->pacAccount->getUsuarioWs(),
+				'password' => $this->pacAccount->getPasswordWs(),
 		);
 		return $params;
 	}

@@ -6,18 +6,18 @@ require_once (dirname(__FILE__) . '/utils/WsErrorResponse.php');
 
 class CancelarComprobanteWs
 {
-	private $accountManager;
+	private $pacAccount;
 	private $cuentaTimbrado;
 	
-	public function __construct(AccountManager $accountManager)
+	public function __construct(CuentaTimbrado $cuentaTimbrado)
 	{
-		$this->accountManager = $accountManager;
-		$this->cuentaTimbrado = $this->accountManager->getCuentaTimbrado();
+		$this->pacAccount = $cuentaTimbrado->getPacAccount();
+		$this->cuentaTimbrado = $cuentaTimbrado;
 	}
 	
 	public function call($cancelacionArray)
 	{
-		$client = new AuthenticatedSoapClient($this->accountManager, $this->accountManager->getLinkWsCancelado());
+		$client = new AuthenticatedSoapClient($this->pacAccount, $this->pacAccount->getLinkWsCancelado());
 		
 		try{
 			$result = $client->call('CancelarComprobante', $this->getParams($cancelacionArray));
@@ -39,13 +39,11 @@ class CancelarComprobanteWs
 	
 	private function getXmlCancelacion($cancelacionArray)
 	{
-		$archivosCSDManager = $this->accountManager->getArchivosCSDManager();
-		
 		$xml =
 		'<?xml version="1.0" encoding="utf-8"?>' .
 		'<Cancelacion' . ' ' .
-		'llaveCertificado="' . $archivosCSDManager->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
-		'certificado="' . $archivosCSDManager->getCertificadoBase64() . '" ' .
+		'llaveCertificado="' . $this->cuentaTimbrado->getCsd()->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
+		'certificado="' . $this->cuentaTimbrado->getCsd()->getCertificadoBase64() . '" ' .
 		'rfcEmisor="' . $this->cuentaTimbrado->getRfcEmisor() . '">' .
 		
 		'<Folios>';
@@ -68,24 +66,19 @@ class CancelarComprobanteWs
 	private function procesarRespuestaWs($resultDOM)
 	{
 		$solicitud = $resultDOM->getElementsByTagName("solicitud")->item(0);
-		if(empty($solicitud))
-		{
+		if (empty($solicitud)) {
 			$solicitud = $resultDOM->getElementsByTagName("Solicitud")->item(0);
 		}
 		
-		if(strtolower($solicitud->getAttribute("esValido")) === "true")
-		{
+		if (strtolower($solicitud->getAttribute("esValido")) === "true") {
 			$folios = $resultDOM->getElementsByTagName("Folios")->item(0);
 			
 			//TODO: aqui solo se procesa el primer folio, se deberian procesar todos.
 			$status = $folios->getElementsByTagName("Folio")->item(0)->getAttribute("Estatus");
 			
-			if(EstatusCancelacionSAT::isErrorStatus($status))
-			{
+			if (EstatusCancelacionSAT::isErrorStatus($status)) {
 				throw new ExceptionPacTimbrado(EstatusCancelacionSAT::getMessage($status));
-			}
-			else
-			{
+			} else {
 				return $status;
 			}
 		} else {

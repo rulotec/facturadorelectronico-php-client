@@ -4,18 +4,18 @@ require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
 
 class ConsultaComprobanteWs
 {
-	private $accountManager;
+	private $pacAccount;
 	private $cuentaTimbrado;
 	
-	public function __construct(AccountManager $accountManager)
+	public function __construct(CuentaTimbrado $cuentaTimbrado)
 	{
-		$this->accountManager = $accountManager;
-		$this->cuentaTimbrado = $this->accountManager->getCuentaTimbrado();
+		$this->pacAccount = $cuentaTimbrado->getPacAccount();
+		$this->cuentaTimbrado = $cuentaTimbrado;
 	}
 	
 	public function call($datosCancelacionFolio)
 	{
-		$client = new AuthenticatedSoapClient($this->accountManager, $this->accountManager->getLinkWsCancelado());
+		$client = new AuthenticatedSoapClient($this->pacAccount, $this->pacAccount->getLinkWsCancelado());
 		$result = $client->call('ConsultaComprobante', $this->getParams($datosCancelacionFolio));
 		
 		return $this->procesarRespuestaWs($result);
@@ -28,7 +28,7 @@ class ConsultaComprobanteWs
 	
 	private function getXml($datosCancelacionFolio)
 	{
-		$archivosCSDManager = $this->accountManager->getArchivosCSDManager();
+	    $csd = $this->cuentaTimbrado->getCsd();
 		
 		$xml =
 		'<?xml version="1.0" encoding="utf-8"?>' .
@@ -37,8 +37,8 @@ class ConsultaComprobanteWs
 		'rfcReceptor="' . $datosCancelacionFolio['rfcReceptor'] .'" ' .
 		'UUID="' . $datosCancelacionFolio['UUID'] . '" ' .
 		'total="' . $datosCancelacionFolio['total'] . '" ' .
-		'llaveCertificado="' . $archivosCSDManager->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
-		'certificado="' . $archivosCSDManager->getCertificadoBase64() . 
+		'llaveCertificado="' . $csd->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
+		'certificado="' . $csd->getCertificadoBase64() . 
 		'"/>';
 		
 		return $xml;
