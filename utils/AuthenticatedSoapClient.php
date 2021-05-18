@@ -47,13 +47,17 @@ class SoapClientWrapper
 	
 	public function call($funcionALlamar, $params)
 	{
+		$timeStart = microtime(true);
 		try
 		{
 			$result = $this->soapClient->$funcionALlamar($params);
 		}
 		catch(SoapFault $fault)
 		{
-			throw new ExceptionPacTimbrado("Error en servicio del PAC: " . $fault->faultstring);
+			$timeEnd = microtime(true);
+			$elapsedSeconds = $timeEnd - $timeStart;
+			$defaultSocketTimeout = ini_get('default_socket_timeout');
+			throw new ExceptionPacTimbrado("Error en servicio del PAC: DST({$defaultSocketTimeout}) ES({$elapsedSeconds}) " . $fault->faultstring);
 		}
 		finally
 		{

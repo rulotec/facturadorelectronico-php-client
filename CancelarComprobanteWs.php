@@ -22,9 +22,16 @@ class CancelarComprobanteWs
 		try{
 			$result = $client->call('CancelarComprobante', $this->getParams($cancelacionArray));
 		} catch (ExceptionPacTimbrado $e) {
-			$wsErrorResponse = new WsErrorResponse($e->getWsResult());
-			if ($wsErrorResponse->isErrorCodePresent(EstatusCancelacionSAT::CODIGO_ERROR_CANCELADO_PREVIAMENTE)) {
-				return EstatusCancelacionSAT::CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE;
+			if ($e->getWsResult()) {
+				$wsErrorResponse = new WsErrorResponse($e->getWsResult());
+				if ($wsErrorResponse->isErrorCodePresent(EstatusCancelacionSAT::CODIGO_ERROR_CANCELADO_PREVIAMENTE)) {
+					return EstatusCancelacionSAT::CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE;
+				}
+			} else {
+				ErrorNotifier::notify(
+					'Excepcion no se pudo obtener getWsResult en CancelarComprobanteWs.php',
+					"{$e->getMessage()} <pre>" . print_r($e->getTrace(), true) . "</pre>"
+				);
 			}
 			throw $e;
 		}

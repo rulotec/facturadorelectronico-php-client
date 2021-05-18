@@ -25,10 +25,16 @@ class ObtenerTimbradoWs
 		{
 			//Es posible que en respuesta de error se incluya timbre si es que factura se había ya timbrado previamente.
 			//Se cacha el error para
-			$this->procesarRespuestaWs($e->getWsResult());
+			if ($e->getWsResult()) {
+				$this->procesarRespuestaWs($e->getWsResult());
+			} else {
+				ErrorNotifier::notify(
+					'Excepcion no se pudo obtener getWsResult  en ObtenerTimbradoWs.php',
+					"{$e->getMessage()} <pre>" . print_r($e->getTrace(), true) . "</pre>"
+				);
+			}
 			
-			if(empty($this->timbreSat))
-			{
+			if(empty($this->timbreSat)) {
 				throw $e;
 			}
 		}
