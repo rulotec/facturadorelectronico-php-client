@@ -1,8 +1,9 @@
 <?php
 
-require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
-require_once (dirname(__FILE__) . '/utils/EstatusCancelacionSAT.php');
-require_once (dirname(__FILE__) . '/utils/WsErrorResponse.php');
+require_once __DIR__ . '/utils/AuthenticatedSoapClient.php';
+require_once __DIR__ . '/utils/EstatusCancelacionSAT.php';
+require_once __DIR__ . '/utils/WsErrorResponse.php';
+require_once 'converter/CfdiConverter.php';
 
 class CancelarComprobanteWs
 {
@@ -46,28 +47,28 @@ class CancelarComprobanteWs
 	
 	private function getXmlCancelacion($cancelacionArray)
 	{
-		$xml =
-		'<?xml version="1.0" encoding="utf-8"?>' .
-		'<Cancelacion' . ' ' .
-		'llaveCertificado="' . $this->cuentaTimbrado->getCsd()->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
-		'certificado="' . $this->cuentaTimbrado->getCsd()->getCertificadoBase64() . '" ' .
-		'rfcEmisor="' . $this->cuentaTimbrado->getRfcEmisor() . '">' .
+		$csd = $this->cuentaTimbrado->getCsd();
 		
-		'<Folios>';
+		$xmlArray = array(
+			'llaveCertificado'  =>  $csd->getXmlRsaKeyLlavePrivadaBase64(),
+			'certificado' =>  $csd->getCertificadoBase64(),
+			'rfcEmisor' =>  $this->cuentaTimbrado->getRfcEmisor(),
+			'Folios' => []
+		);
 		
 		foreach($cancelacionArray as $datosCancelacionFolio)
 		{
-			$xml .=
-			'<Folio ' .
-			'UUID="' . $datosCancelacionFolio['UUID'] . '" ' .
-			'total="' . $datosCancelacionFolio['total'] . '" ' .
-			'rfcReceptor="' . $datosCancelacionFolio['rfcReceptor'] . '"/>';
+			$xmlArray['Folios'][] = array(
+				'UUID'  =>  $datosCancelacionFolio['UUID'],
+				'total'  =>  $datosCancelacionFolio['total'],
+				'rfcReceptor'  =>  $datosCancelacionFolio['rfcReceptor'],
+			);
 		}
-		$xml .=
-		'</Folios>' .
-		'</Cancelacion>';
 		
-		return $xml;
+		$rootCfdiXml = '<?xml version="1.0" encoding="utf-8"?><Cancelacion/>';
+		$sxml = CfdiXmlUtils::array2SimpleXml($rootCfdiXml, $xmlArray, '');
+		
+		return $sxml->asXml();
 	}
 	
 	private function procesarRespuestaWs($resultDOM)

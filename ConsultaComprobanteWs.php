@@ -1,6 +1,7 @@
 <?php
 
-require_once (dirname(__FILE__) . '/utils/AuthenticatedSoapClient.php');
+require_once __DIR__ . '/utils/AuthenticatedSoapClient.php';
+require_once 'converter/CfdiConverter.php';
 
 class ConsultaComprobanteWs
 {
@@ -28,20 +29,21 @@ class ConsultaComprobanteWs
 	
 	private function getXml($datosCancelacionFolio)
 	{
-	    $csd = $this->cuentaTimbrado->getCsd();
+		$csd = $this->cuentaTimbrado->getCsd();
 		
-		$xml =
-		'<?xml version="1.0" encoding="utf-8"?>' .
-		'<ConsultaCfdi' . ' ' .
-		'rfcEmisor="' . $this->cuentaTimbrado->getRfcEmisor() . '" ' .
-		'rfcReceptor="' . $datosCancelacionFolio['rfcReceptor'] .'" ' .
-		'UUID="' . $datosCancelacionFolio['UUID'] . '" ' .
-		'total="' . $datosCancelacionFolio['total'] . '" ' .
-		'llaveCertificado="' . $csd->getXmlRsaKeyLlavePrivadaBase64() . '" ' .
-		'certificado="' . $csd->getCertificadoBase64() . 
-		'"/>';
+		$consultaArray = array(
+			'rfcEmisor' =>  $this->cuentaTimbrado->getRfcEmisor(),
+			'rfcReceptor'  =>  $datosCancelacionFolio['rfcReceptor'],
+			'UUID'  =>  $datosCancelacionFolio['UUID'],
+			'total'  =>  $datosCancelacionFolio['total'],
+			'llaveCertificado'  =>  $csd->getXmlRsaKeyLlavePrivadaBase64(),
+			'certificado' =>  $csd->getCertificadoBase64(),
+		);
 		
-		return $xml;
+		$rootCfdiXml = '<?xml version="1.0" encoding="utf-8"?><ConsultaCfdi/>';
+		$sxml = CfdiXmlUtils::array2SimpleXml($rootCfdiXml, $consultaArray, '');
+		
+		return $sxml->asXml();
 	}
 	
 	private function procesarRespuestaWs($resultDOM)
@@ -52,12 +54,9 @@ class ConsultaComprobanteWs
 		$estado = $resultDOM->getElementsByTagName("Estado")->item(0)->nodeValue;
 		$estatusCancelacion = $resultDOM->getElementsByTagName("EstatusCancelacion")->item(0)->nodeValue;
 		
-		if(substr($codigoEstatus, 0, 1) === 'S')
-		{
+		if (substr($codigoEstatus, 0, 1) === 'S') {
 			return array('CodigoEstatus' => $codigoEstatus, 'EsCancelable' => $esCancelable, 'Estado' => $estado, 'EstatusCancelacion' => $estatusCancelacion);
-		}
-		else
-		{
+		} else {
 			throw new ExceptionPacTimbrado("CodigoEstatus: {$codigoEstatus} - EsCancelable: {$esCancelable} - Estado: {$estado}- EstatusCancelacion: {$estatusCancelacion}");
 		}
 	}
