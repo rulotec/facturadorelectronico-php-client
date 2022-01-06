@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/utils/AuthenticatedSoapClient.php';
-require_once 'converter/CfdiConverter.php';
+require_once 'converter/CfdiXmlUtils.php';
 
 class ConsultaComprobanteWs
 {

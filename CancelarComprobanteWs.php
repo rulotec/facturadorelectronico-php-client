@@ -3,7 +3,7 @@
 require_once __DIR__ . '/utils/AuthenticatedSoapClient.php';
 require_once __DIR__ . '/utils/EstatusCancelacionSAT.php';
 require_once __DIR__ . '/utils/WsErrorResponse.php';
-require_once 'converter/CfdiConverter.php';
+require_once 'converter/CfdiXmlUtils.php';
 
 class CancelarComprobanteWs
 {
@@ -62,6 +62,8 @@ class CancelarComprobanteWs
 				'UUID'  =>  $datosCancelacionFolio['UUID'],
 				'total'  =>  $datosCancelacionFolio['total'],
 				'rfcReceptor'  =>  $datosCancelacionFolio['rfcReceptor'],
+			    'motivo' => $datosCancelacionFolio['motivo'],
+			    'folioSustitucion' => $datosCancelacionFolio['folioSustitucion'],
 			);
 		}
 		
