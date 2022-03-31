@@ -58,7 +58,7 @@ class CancelarComprobanteWs
 		
 		foreach($cancelacionArray as $datosCancelacionFolio)
 		{
-			$xmlArray['Folios'][] = array(
+			$xmlArray['Folios']['Folio'][] = array(
 				'UUID'  =>  $datosCancelacionFolio['UUID'],
 				'total'  =>  $datosCancelacionFolio['total'],
 				'rfcReceptor'  =>  $datosCancelacionFolio['rfcReceptor'],
