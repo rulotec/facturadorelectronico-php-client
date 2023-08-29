@@ -2,8 +2,8 @@
 
 class EstatusCancelacionSAT
 {
-	const CODIGO_CANCELACION_EXITOSA = 201;
-	const CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE = 202;
+	const CODIGO_SOLICITUD_DE_CANCELACION_RECIBIDA = 201;
+	const CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE = 202;//Solo este código implica que el CFDI está cancelado.
 	const CODIGO_RFC_NO_CORRESPONDE_AL_UUID = 203;
 	const CODIGO_FACTURA_NO_REGISTRADA_EN_SAT_AUN = 205;
 	const CODIGO_CFDI_NO_ES_DE_SECTOR_PRIMARIO = 206;
@@ -13,7 +13,7 @@ class EstatusCancelacionSAT
 	public static function isErrorStatus($status)
 	{
 		$intStatus = (int) $status;
-		if($intStatus === self::CODIGO_CANCELACION_EXITOSA || $intStatus === self::CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE)
+		if($intStatus === self::CODIGO_SOLICITUD_DE_CANCELACION_RECIBIDA || $intStatus === self::CODIGO_CANCELACION_YA_REALIZADA_ANTERIORMENTE)
 		{
 			return false;
 		}
@@ -25,7 +25,7 @@ class EstatusCancelacionSAT
 		$intStatus = (int) $status;
 		switch ($intStatus)
 		{
-			case self::CODIGO_CANCELACION_EXITOSA:
+			case self::CODIGO_SOLICITUD_DE_CANCELACION_RECIBIDA:
 				$msg ="Petición de cancelación recibida exitosamente.";
 				break;
 				
